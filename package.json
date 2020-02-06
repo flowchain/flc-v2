@@ -1,0 +1,40 @@
+{
+  "name": "flc-v2",
+  "author": "jollen",
+  "version": "1.0.0",
+  "description": "The Flowchain token (FLC v2) smart contract",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "fix:js": "eslint --fix test/**/*.js migrations/**/*.js",
+    "lint:js": "eslint test/**/*.js migrations/**/*.js",
+    "lint:sol": "solhint contracts/*.sol contracts/*/*.sol test/*.sol test/*/*.sol",
+    "lint": "npm run lint:js && npm run lint:sol",
+    "publish": "truffle publish",
+    "pretest": "npm run lint",
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flowchain/flc-v2.git"
+  },
+  "keywords": [
+    "ethereum"
+  ],
+  "authors": [
+    "Jollen <jollen@flowchain.io>"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flowchain/smart-contracts/issues"
+  },
+  "homepage": "https://flowchain.co/",
+  "dependencies": {
+    "solc": "^0.6.2",
+    "truffle": "^5.1.11",
+    "truffle-hdwallet-provider": "^1.0.17"
+  }
+}
