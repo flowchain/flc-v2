@@ -145,6 +145,7 @@ contract OffchainIssuable {
 
     /**
      * @dev Redeem the value of tokens to the address 'msg.sender'
+     * @param to The user that will receive the redeemed token.
      * @param amount Number of tokens to redeem.
      */
     function redeem(address to, uint256 amount) external returns (bool success);
@@ -342,9 +343,9 @@ contract FlowchainToken is StandardToken, Mintable, OffchainIssuable, Ownable, P
 
     /**
      * @dev Redeem user mintable tokens. Only the mining contract can redeem tokens.
-     * @param to The user to be redeemed tokens     
+     * @param to The user that will receive the redeemed token.     
      * @param amount The amount of tokens to be withdrawn
-     * @return The result of the withdraw
+     * @return The result of the redeem
      */
     function redeem(address to, uint256 amount) external returns (bool success) {
         require(msg.sender == mintableAddress);    
