@@ -14,7 +14,7 @@ The FLC v2 (or the "FLC native token") is the new update of the original FLC v1.
 
 # Off-Chain Issuable Tokens
 
-The FLC v2 token (or the "FLC native token") has many new updates as opposed to the FLC v1 token. The FLC v1 token launched in 2019 is designed to be a mintable token that can be minted by an on-chain smart contract. Moreover, the FLC v2 token is also a mintable token that a number of tokens can also be minted that can be offered to a market.
+The FLC v2 token (or the "FLC native token") has many new updates as opposed to the FLC v1 token. The FLC v1 token launched in 2019 is designed to be a mintable token that can be minted by an on-chain smart contract. Moreover, the FLC v2 token is also a mintable token that a number of tokens can also be minted and can be offered to a market.
 
 As described in the academic paper: [Hybrid Blockchain and Pseudonymous Authentication for Secure and Trusted IoT Networksr](https://dl.acm.org/citation.cfm?doid=3292384.3292388), Flowchain has a hybrid architecture comprised of private blockchains (or "off-chain") and a public blockchain (or "on-chain"). Thus, to support Flowchain's hybrid architecture, FLC requires an off-chain issuable token technology to provide minted token redeem and user withdrawal capabilities. 
 
@@ -30,7 +30,7 @@ A method to set an minimal withdraw amount:
 function setMinWithdrawAmount(uint256 amount) public returns (bool success);
 ```
 
-A method to set a minimal withdraw amount:
+A method to get the minimal withdraw amount:
 
 ```solidity
 function getMinWithdrawAmount() public returns (uint256 amount);
@@ -50,7 +50,7 @@ function withdraw(uint256 amount) public returns (bool success);
 
 The user can send a signed message to the FLC v2 smart contract to withdraw funds (the "token rewards") to their ERC-20 compatible wallet.
 
-A method to setup a mintable address that can mint:
+A method to setup a mintable address that can mint token:
 
 ```solidity
 function setupMintableAddress(address _mintable) public returns (bool success);
