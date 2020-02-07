@@ -53,7 +53,7 @@ The user can send a signed message to the FLC v2 smart contract to withdraw fund
 A method to setup a mintable address that can mint tokens:
 
 ```solidity
-function setupMintableAddress(address setupMintableAddress) public returns (bool success);
+function setupMintableAddress(address mintableAddress) public returns (bool success);
 ```
 
 A method to mint an amount of tokens and transfer to the address:
