@@ -48,7 +48,7 @@ A method to withdraw user funds:
 function withdraw(uint256 amount) public returns (bool success);
 ```
 
-The user can send a signed message to the FLC v2 smart contract to withdraw their funds (the "token rewards") to their ERC-20 compatible wallet.
+The user can send a signed message to the FLC v2 smart contract to withdraw funds (the "token rewards") to their ERC-20 compatible wallet.
 
 A method to setup a mintable address that can mint:
 
@@ -70,7 +70,7 @@ The `redeem` function can only be invoked by the mining contract at the address 
 
 Also, `redeem` shall call `mintToken` to mint new tokens and send the funds back to the mining contract:
 
-```
+```solidity
 contract StandardToken {
     /**
      * @dev Redeem user mintable tokens. Only the mining contract can redeem tokens.
