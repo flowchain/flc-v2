@@ -50,10 +50,10 @@ function withdraw(uint256 amount) public returns (bool success);
 
 The user can send a signed message to the FLC v2 smart contract to withdraw funds (the "token rewards") to their ERC-20 compatible wallet.
 
-A method to setup a mintable address that can mint token:
+A method to setup a mintable address that can mint tokens:
 
 ```solidity
-function setupMintableAddress(address _mintable) public returns (bool success);
+function setupMintableAddress(address setupMintableAddress) public returns (bool success);
 ```
 
 A method to mint an amount of tokens and transfer to the address:
