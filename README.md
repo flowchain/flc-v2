@@ -10,11 +10,45 @@ The Flowchain token (FLC v2) smart contract. This repository hosts the source co
 
 # Introduction
 
-The FLC v2 (or the “FLC native token”) is the new update of the original FLC v1 and can be used in Flowchain Network. Please visit the [Flowchain Token](https://flowchain.co/token.html) official website for more information.
+The FLC v2 (or the "FLC native token") is the new update of the original FLC v1. Please visit the [Flowchain Token](https://flowchain.co/token.html) official website for more information. For detailed information on FLC v2, we plan to release an official FLC v2 whitepaper in March 2020.
 
-FLC v1, as described in its legal opinion report in 2019, is an utility token that can be used in the Flowchain Network. And as an utility token, the FLC v1 token can also be offered to a market for attention, acquisition or consumption. Furthermore, to support Flowchain’s hybrid architecture, FLC requires an off-chain issuable token technology to provide minted token redeem and user withdraw capabilities. 
+# Off-Chain Issuable Tokens
 
-Thus, an upgrade to the original FLC v1 smart contract shall be applied in prior to the coming Flowchain mainnet launch. For detailed information of FLC v2, please read the official FLC v2 whitepaper: [Off-Chain Issuance of FLC Native Tokens](https://flowchain.co/token.html)
+The FLC v2 token (or the "FLC native token") has many new updates as opposed to the FLC v1 token. The FLC v1 token launched in 2019 is designed to be a mintable token that can be minted by an on-chain smart contract. Moreover, the FLC v2 token is also a mintable token that a number of tokens can also be minted that can be offered to a market.
+
+As described in the academic paper: [Hybrid Blockchain and Pseudonymous Authentication for Secure and Trusted IoT Networksr](https://dl.acm.org/citation.cfm?doid=3292384.3292388), Flowchain has a hybrid architecture comprised of private blockchains (or "off-chain") and a public blockchain (or "on-chain"). Thus, to support Flowchain's hybrid architecture, FLC requires an off-chain issuable token technology to provide minted token redeem and user withdrawal capabilities. 
+
+Such capabilities are lack in the FLC v1 tokens; thus, an upgrade to the original FLC v1 smart contract is required prior to the coming Flowchain main net launch.
+
+# Specification
+
+Flowchain proposes an extension to ERC-20 that adds off-chain issuable and mintable tokens.
+
+A method to set an minimal withdraw amount:
+
+```solidity
+function setMinWithdrawAmount(uint256 amount) public returns (bool success);
+```
+
+A method to set a minimal withdraw amount:
+
+```solidity
+function getMinWithdrawAmount() public returns (uint256 amount);
+```
+
+A method to redeem the value of tokens to the address of the block producer (the "user"):
+
+```solidity
+function redeem(address to, uint256 amount) external returns (bool success);
+```
+
+A method to withdraw user funds:
+
+```solidity
+function withdraw(uint256 amount) public returns (bool success);
+```
+
+The user can send a signed message to the FLC v2 smart contract to withdraw their funds (the "token rewards") to their ERC-20 compatible wallet.
 
 # Development
 
