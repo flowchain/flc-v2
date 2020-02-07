@@ -20,7 +20,7 @@ As described in the academic paper: [Hybrid Blockchain and Pseudonymous Authenti
 
 Such capabilities are lack in the FLC v1 tokens; thus, an upgrade to the original FLC v1 smart contract is required prior to the coming Flowchain main net launch.
 
-# Specification
+## Specification
 
 Flowchain proposes an extension to ERC-20 that adds off-chain issuable and mintable tokens.
 
@@ -49,6 +49,46 @@ function withdraw(uint256 amount) public returns (bool success);
 ```
 
 The user can send a signed message to the FLC v2 smart contract to withdraw their funds (the "token rewards") to their ERC-20 compatible wallet.
+
+A method to setup a mintable address that can mint:
+
+```solidity
+function setupMintableAddress(address _mintable) public returns (bool success);
+```
+
+A method to mint an amount of tokens and transfer to the address:
+
+```solidity
+function mintToken(address to, uint256 amount) public returns (bool success);
+```
+
+A mintable address is the mining contract that can mint and redeem tokens.
+
+## Implementation
+
+The `redeem` function can only be invoked by the mining contract at the address set by `setupMintableAddress`. 
+
+Also, `redeem` shall call `mintToken` to mint new tokens and send the funds back to the mining contract:
+
+```
+contract StandardToken {
+    /**
+     * @dev Redeem user mintable tokens. Only the mining contract can redeem tokens.
+     * @param to The user to be redeemed tokens     
+     * @param amount The amount of tokens to be withdrawn
+     * @return The result of the withdraw
+     */
+    function redeem(address to, uint256 amount) external returns (bool success) {
+        require(msg.sender == mintableAddress);    
+
+        // Mint new tokens and send the funds to the account `mintableAddress`
+        // Users can withdraw funds.
+        mintToken(mintableAddress, amount);
+
+        return true;
+    }
+}
+```
 
 # Development
 
