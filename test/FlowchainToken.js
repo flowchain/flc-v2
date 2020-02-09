@@ -208,9 +208,29 @@ contract('FlowchainToken', function(accounts,) {
     });
   });  
 
-  it('should return a balance of 3620 in the user account after token withdraw', function() {
+  it('should return a balance of 3820 in the user account after token withdraw', function() {
     return tokenInstance.balanceOf(ownerAccount).then(function(balance) {
       assert.equal(balance.toString(10), '3820');
     });
-  });          
+  });
+
+  it('should not issue tokens without enough balance', async function() {
+    return minerInstance.issue(ownerAccount, '0x7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff').then(function(tx) {
+      return minerInstance.doRevert();
+    }).catch(function (err) {
+      return tokenInstance.balanceOf(ownerAccount);
+    }).then(function (balance) {
+      assert.equal(balance.toString(10), '3820');
+    });
+  });  
+
+  it('should not issue tokens with an overflowed amount', async function() {
+    return minerInstance.issue(ownerAccount, '0x8000000000000000000000000000000000000000000000000000000000000000').then(function(tx) {
+      return minerInstance.doRevert();
+    }).catch(function (err) {
+      return tokenInstance.balanceOf(ownerAccount);
+    }).then(function (balance) {
+      assert.equal(balance.toString(10), '3820');
+    });
+  });           
 });
