@@ -141,7 +141,21 @@ contract OffchainIssuable {
      * @dev Resume the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function getMinWithdrawAmount() public returns (uint256 amount);
+    function getMinWithdrawAmount() public view returns (uint256 amount);
+
+    /**
+     * @dev Returns the amount of tokens redeemed to `_owner`.
+     * @param _owner The address from which the amount will be retrieved
+     * @return The amount
+     */
+    function amountRedeemOf(address _owner) public view returns (uint256 amount);
+
+    /**
+     * @dev Returns the amount of tokens withdrawn by `_owner`.
+     * @param _owner The address from which the amount will be retrieved
+     * @return The amount
+     */
+    function amountWithdrawOf(address _owner) public view returns (uint256 amount);
 
     /**
      * @dev Redeem the value of tokens to the address 'msg.sender'
@@ -342,6 +356,24 @@ contract FlowchainToken is StandardToken, Mintable, OffchainIssuable, Ownable, P
     }
 
     /**
+     * @dev Returns the amount of tokens redeemed to `_owner`.
+     * @param _owner The address from which the amount will be retrieved
+     * @return The amount
+     */
+    function amountRedeemOf(address _owner) public view returns (uint256 amount) {
+        return _amountRedeem[_owner];
+    }
+
+    /**
+     * @dev Returns the amount of tokens withdrawn by `_owner`.
+     * @param _owner The address from which the amount will be retrieved
+     * @return The amount
+     */
+    function amountWithdrawOf(address _owner) public view returns (uint256 amount) {
+        return _amountRedeem[_owner];
+    }
+
+    /**
      * @dev Redeem user mintable tokens. Only the mining contract can redeem tokens.
      * @param to The user that will receive the redeemed token.     
      * @param amount The amount of tokens to be withdrawn
@@ -370,19 +402,19 @@ contract FlowchainToken is StandardToken, Mintable, OffchainIssuable, Ownable, P
     function withdraw(uint256 amount) public returns (bool success) {
         require(_isIssuable == true);
 
-        require(amount > 0);    
+        // Safety check
+        require(amount > 0);        
         require(amount <= _amountRedeem[msg.sender]);
         require(amount >= MIN_WITHDRAW_AMOUNT);
 
-        // The balance of the user after token withdraw.
-        uint256 balance = _amountRedeem[msg.sender] - amount;
-        require(balance > 0);
+        // Transfer the amount of tokens in the mining contract `mintableAddress` to the user account
+        require(balances[mintableAddress] >= amount);
+
+        // The balance of the user redeemed tokens.
+        _amountRedeem[msg.sender] -= amount;
 
         // Keep track of the tokens minted by the user.
         _amountMinted[msg.sender] += amount;
-
-        // Transfer the amount of tokens in the mining contract `mintableAddress` to the user account
-        require(balances[mintableAddress] >= amount);
 
         balances[mintableAddress] -= amount;
         balances[msg.sender] += amount;
@@ -432,7 +464,7 @@ contract FlowchainToken is StandardToken, Mintable, OffchainIssuable, Ownable, P
      * @dev Resume the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function getMinWithdrawAmount() public returns (uint256 amount) {
+    function getMinWithdrawAmount() public view returns (uint256 amount) {
         return MIN_WITHDRAW_AMOUNT;
     }
 
