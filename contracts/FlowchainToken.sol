@@ -370,7 +370,7 @@ contract FlowchainToken is StandardToken, Mintable, OffchainIssuable, Ownable, P
      * @return The amount
      */
     function amountWithdrawOf(address _owner) public view returns (uint256 amount) {
-        return _amountRedeem[_owner];
+        return _amountMinted[_owner];
     }
 
     /**
