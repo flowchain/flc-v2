@@ -1,6 +1,6 @@
 # FLC v2
 
-The Flowchain token (FLC v2) smart contract. This repository hosts the source code for public audits.
+The DEXTOKEN smart contract. This repository hosts the source code for public audits.
 
 # Prerequisites
 
@@ -128,6 +128,13 @@ In the previous terminal, run the following to test contracts:
 
 ```
 $ truffle test
+```
+
+## MythX
+
+```
+$ npm install -g truffle-security
+$ truffle run verify
 ```
 
 # License
