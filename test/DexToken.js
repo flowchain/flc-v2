@@ -1,4 +1,4 @@
-var FlowchainToken = artifacts.require('FlowchainToken');
+var DexToken = artifacts.require('DexToken');
 var MiningTest = artifacts.require('MiningTest');
 
 var ownerAccount;           // The default owner account. Should be accounts[0]
@@ -18,14 +18,14 @@ var multiSigWallet = '0xc5fdf4076b8f3a5357c5e395ab970b5b54098fef';
 // Use me in localhost
 var network = 'development';
 
-contract('FlowchainToken', function(accounts,) {
+contract('DexToken', function(accounts,) {
   var BN = require('bn.js');
   var decimals = '000000000000000000';
 
   mintableAddress = accounts[0];
 
   it('should instantiate a token contract', function() {
-    token = FlowchainToken.new(multiSigWallet);
+    token = DexToken.new(multiSigWallet);
     // Wait for the token contract.
     // The amount of total supply gives to the creator. The contract calls transfer
     // from the address 0x0, therefore, we have to wait until the instantiatation finish.

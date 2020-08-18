@@ -61,7 +61,7 @@ contract Pausable is Ownable {
 
     bool private _paused;
 
-    constructor () internal {
+    constructor () public {
         _paused = false;
     }    
 
@@ -147,15 +147,11 @@ library SafeMath {
  * @title The mintable FLC tokens.
  */
 contract Mintable {
-    /**
-     * @dev Mint a amount of tokens and the funds to the user.
-     */
-    function mintToken(address to, uint256 amount) public returns (bool success);  
+    using SafeMath for uint;
 
-    /**
-     * @dev Setup a mintable address that can mint or mine tokens.
-     */    
-    function setupMintableAddress(address _mintable) public returns (bool success);
+    function addMinter(address minter) external returns (bool success);
+    function removeMinter(address minter) external returns (bool success);
+    function mint(address to, uint amount) external returns (bool success);    
 }
 
 /**
@@ -164,39 +160,31 @@ contract Mintable {
 contract OffchainIssuable {
     using SafeMath for uint;
 
-    mapping (address => uint) public _amountMinted;
-    mapping (address => uint) public _amountRedeem;
-
-    /**
-     * The minimal withdraw ammount.
-     */
-    uint public _min_withdraw_amount = 100;
-
     /**
      * @dev Suspend the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function setMinWithdrawAmount(uint amount) public returns (bool success);
+    function setMinWithdrawAmount(uint amount) external returns (bool success);
 
     /**
      * @dev Resume the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function getMinWithdrawAmount() public view returns (uint amount);
+    function getMinWithdrawAmount() external view returns (uint amount);
 
     /**
      * @dev Returns the amount of tokens redeemed to `_owner`.
      * @param _owner The address from which the amount will be retrieved
      * @return The amount
      */
-    function amountRedeemOf(address _owner) public view returns (uint amount);
+    function amountRedeemOf(address _owner) external view returns (uint amount);
 
     /**
      * @dev Returns the amount of tokens withdrawn by `_owner`.
      * @param _owner The address from which the amount will be retrieved
      * @return The amount
      */
-    function amountWithdrawOf(address _owner) public view returns (uint amount);
+    function amountWithdrawOf(address _owner) external view returns (uint amount);
 
     /**
      * @dev Redeem the value of tokens to the address 'msg.sender'
@@ -209,7 +197,7 @@ contract OffchainIssuable {
      * @dev The user withdraw API.
      * @param amount Number of tokens to redeem.
      */
-    function withdraw(uint amount) public returns (bool success);   
+    function withdraw(address pool, uint amount) external returns (bool success);
 }
 
 /**
@@ -351,6 +339,10 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
     using SafeMath for uint;
 
     bool internal _isIssuable;
+    uint private _min_withdraw_amount = 100;
+
+    mapping (address => uint) private _amountMinted;
+    mapping (address => uint) private _amountRedeem;
 
     event Freeze(address indexed account);
     event Unfreeze(address indexed account);
@@ -363,7 +355,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
         _;
     }
 
-    constructor () public ERC20Detailed("Dextoken.io", "DIO", 18) {
+    constructor () public ERC20Detailed("Dextoken", "DTK", 18) {
         _isIssuable = true;
     }
 
@@ -395,7 +387,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @return bool return 'true' if tokens can still be issued by the issuer, 
      * 'false' if they can't anymore.
      */
-    function isIssuable() public view returns (bool success) {
+    function isIssuable() external view returns (bool success) {
         return _isIssuable;
     }
 
@@ -404,7 +396,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @param account The address of the user who will be frozen
      * @return The result of freezing an user
      */
-    function freezeAccount(address account) public onlyOwner returns (bool) {
+    function freezeAccount(address account) external onlyOwner returns (bool) {
         require(!frozenAccount[account], "ERC20: account frozen");
         frozenAccount[account] = true;
         emit Freeze(account);
@@ -416,7 +408,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @param account The address of the user who will be unfrozen
      * @return The result of unfreezing an user
      */
-    function unfreezeAccount(address account) public onlyOwner returns (bool) {
+    function unfreezeAccount(address account) external onlyOwner returns (bool) {
         require(frozenAccount[account], "ERC20: account not frozen");
         frozenAccount[account] = false;
         emit Unfreeze(account);
@@ -428,12 +420,12 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @param minter The address of the smart contract
      * @return The result of the setup
      */
-    function addMinter(address minter) public onlyOwner returns (bool success) {
+    function addMinter(address minter) external onlyOwner returns (bool success) {
         minters[minter] = true;
         return true;
     }
 
-    function removeMinter(address minter) public onlyOwner returns (bool success) {
+    function removeMinter(address minter) external onlyOwner returns (bool success) {
         minters[minter] = false;
         return true;
     }
@@ -442,7 +434,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @dev Suspend the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function setMinWithdrawAmount(uint amount) public onlyOwner returns (bool success) {
+    function setMinWithdrawAmount(uint amount) external onlyOwner returns (bool success) {
         require(amount > 0, "ERC20: amount invalid");
         _min_withdraw_amount = amount;
         return true;
@@ -452,7 +444,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @dev Resume the issuance of new tokens.
      * Once set to false, '_isIssuable' can never be set to 'true' again.
      */
-    function getMinWithdrawAmount() public view returns (uint amount) {
+    function getMinWithdrawAmount() external view returns (uint amount) {
         return _min_withdraw_amount;
     }
 
@@ -461,7 +453,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @param _owner The address from which the amount will be retrieved
      * @return The amount
      */
-    function amountRedeemOf(address _owner) public view returns (uint amount) {
+    function amountRedeemOf(address _owner) external view returns (uint amount) {
         return _amountRedeem[_owner];
     }
 
@@ -470,49 +462,76 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
      * @param _owner The address from which the amount will be retrieved
      * @return The amount
      */
-    function amountWithdrawOf(address _owner) public view returns (uint amount) {
+    function amountWithdrawOf(address _owner) external view returns (uint amount) {
         return _amountMinted[_owner];
     }
 
     /**
      * @dev Redeem user mintable tokens. Only the mining contract can redeem tokens.
-     * @param to The user that will receive the redeemed token.     
+     * @param pool The token pool that will receive the redeemed token.     
      * @param amount The amount of tokens to be withdrawn
      * @return The result of the redeem
      */
-    function redeem(address to, uint amount) external returns (bool success) {
+    function redeem(address pool, uint amount) external returns (bool success) {
+        require(minters[msg.sender], "!minter");    
         require(_isIssuable == true, "ERC20: token not issuable");
         require(amount > 0, "ERC20: amount invalid");
 
         // The total amount of redeem tokens to the user.
-        _amountRedeem[to].sub(amount, "ERC20: transfer amount exceeds redeem");
+        _amountRedeem[pool].sub(amount, "ERC20: transfer amount exceeds redeem");
 
         // Mint new tokens and send the funds to the account `mintableAddress`
         // Users can withdraw funds.
-        _amountMinted[to].add(amount);
-        _mint(to, amount);
+        _amountMinted[pool].add(amount);
+        _mint(pool, amount);
         return true;
+    }
+
+    /**
+     * @dev The user can withdraw his minted tokens from the staking pool.
+     * @param amount The amount of tokens to be withdrawn
+     * @return The result of the withdraw
+     */
+    function withdraw(address pool, uint amount) external returns (bool success) {
+        require(minters[pool], "!minter");    
+        require(_isIssuable == true, "ERC20: not issuable");
+
+        // Safety check
+        require(amount > 0, "ERC20: redeem must greater than zero");        
+        require(amount <= _amountRedeem[msg.sender], "ERC20: redeem not enough balance");
+        require(amount >= _min_withdraw_amount, "ERC20: redeem too small");
+
+        // The balance of the user redeemed tokens.
+        _amountRedeem[msg.sender].sub(amount, "ERC20: redeem exceeds balance");
+
+        // Keep track of the tokens minted by the user.
+        _amountMinted[msg.sender].add(amount);
+
+        _transfer(pool, msg.sender, amount);
+        
+        emit Transfer(pool, msg.sender, amount);
+        return true;               
     }
 
     /**
      * @dev Mint an amount of tokens and transfer to the user
-     * @param to The address of the user who will receive the tokens
+     * @param account The address of the user who will receive the tokens
      * @param amount The amount of tokens
      * @return The result of token minting
      */
-    function mint(address to, uint256 amount) public returns (bool success) {
+    function mint(address account, uint amount) external returns (bool success) {
         require(minters[msg.sender], "!minter");    
-        _amountRedeem[to].add(amount);
+        _amountRedeem[account].add(amount);
         return true;
     }
 
     /**
-     * @dev Burn an amount of tokens and transfer to the user
-     * @param account The address of the user
+     * @dev Burn an amount of tokens
+     * @param account The address of the wallet
      * @param amount The amount of tokens to burn
      * @return The result of token burning
      */
-    function burn(address account, uint256 amount) public onlyOwner returns (bool success) {
+    function burn(address account, uint amount) external onlyOwner returns (bool success) {
         _burn(account, amount);
         return true;
     }    
