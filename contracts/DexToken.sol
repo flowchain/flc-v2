@@ -144,7 +144,7 @@ library SafeMath {
 }
 
 /**
- * @title The mintable FLC tokens.
+ * @title The mintable tokens.
  */
 contract Mintable {
     using SafeMath for uint;
@@ -155,7 +155,7 @@ contract Mintable {
 }
 
 /**
- * @title The off-chain issuable FLC tokens.
+ * @title The off-chain issuable tokens.
  */
 contract OffchainIssuable {
     using SafeMath for uint;
@@ -331,7 +331,7 @@ contract ERC20Detailed is IERC20 {
 
 /**
  * @dev Extension of ERC-20 that adds off-chain issuable and mintable tokens.
- * It allows miners to mint (create) new DIO tokens.
+ * It allows miners to mint (create) new tokens.
  *
  * At construction, the contract `_mintableAddress` is the only token minter.
  */
@@ -355,7 +355,7 @@ contract DexToken is ERC20, ERC20Detailed, Mintable, OffchainIssuable, Ownable, 
         _;
     }
 
-    constructor () public ERC20Detailed("Dextoken", "DTK", 18) {
+    constructor () public ERC20Detailed("Dextoken Governance", "DEXG", 18) {
         _isIssuable = true;
     }
 
