@@ -5,7 +5,6 @@ var ownerAccount;           // The default owner account. Should be accounts[0]
 var token;                  // The constructor promise of token contract
 var tokenInstance;          // The token contract instance
 var tokenContractAddress;   // The token contract address
-var mintableAddress;        // Should be accounts[0]
 
 // Use me in localhost
 var network = 'development';
@@ -14,7 +13,7 @@ contract('DexToken', function(accounts,) {
   var BN = require('bn.js');
   var decimals = '000000000000000000';
 
-  mintableAddress = accounts[0];
+  ownerAccount = accounts[0];
 
   it('should instantiate a token contract', function() {
     token = DexToken.new();
@@ -26,20 +25,7 @@ contract('DexToken', function(accounts,) {
       tokenContractAddress = instance.address;
       assert.equal(typeof tokenContractAddress, 'string');
     });
-  });
-
-  it('should return a balance of 0 after instantiatation', function() {
-    return tokenInstance.balanceOf(tokenContractAddress).then(function(balance) {
-      assert.equal(balance, 0);
-    });
-  }); 
-
-  it('should return the address of token creator', function() {
-    return tokenInstance.getCreator().then(function(address) {
-      ownerAccount = address;
-      assert.equal(address, accounts[0]);
-    });
-  });      
+  });    
 
   it('should return a balance of 0 in owner account', function() {
     return tokenInstance.balanceOf(ownerAccount).then(function(balance) {
@@ -47,7 +33,13 @@ contract('DexToken', function(accounts,) {
     });
   });    
 
-  it('should mint 5000 tokens and send to ownerAccount', function() {
+  it('should add owner account to minters', function() {
+    return tokenInstance.addMinter(ownerAccount).then(function(tx) {
+      assert.equal(tx.receipt.status, true);
+    });
+  }); 
+
+  it('should mint 5000 tokens to owner account', function() {
     return tokenInstance.mint(ownerAccount, 5000).then(function(tx) {
       assert.equal(tx.receipt.status, true);
     });
@@ -69,11 +61,29 @@ contract('DexToken', function(accounts,) {
     return tokenInstance.balanceOf(ownerAccount).then(function(balance) {
       assert.equal(balance.toString(10), '4000');
     });
-  }); 
+  });  
 
   it('should return a balance of 1000 in the user account', function() {
     return tokenInstance.balanceOf(accounts[1]).then(function(balance) {
       assert.equal(balance.toString(10), '1000');
     });
-  });         
+  });
+
+  it('should return the total supply', function() {
+    return tokenInstance.totalSupply().then(function(supply) {
+      assert.equal(supply.toString(10), '5000');
+    });
+  });
+
+  it('should burn 500 tokens of the user account', function() {
+    return tokenInstance.burn(accounts[1], 500).then(function(tx) {
+      assert.equal(tx.receipt.status, true);
+    });
+  });
+
+  it('should return a balance of 500 in the user account', function() {
+    return tokenInstance.balanceOf(accounts[1]).then(function(balance) {
+      assert.equal(balance.toString(10), '500');
+    });
+  });                  
 });
