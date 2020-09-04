@@ -29,7 +29,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/flowchain/smart-contracts/issues"
+    "url": "https://github.com/flowchain/flc-v2/issues"
   },
   "homepage": "https://flowchain.co/",
   "dependencies": {
